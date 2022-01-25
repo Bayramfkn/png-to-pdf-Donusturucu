@@ -1,0 +1,82 @@
+using System;
+using System.IO;
+using System.Windows.Forms;
+using iText.IO.Image;
+using iText.Kernel.Geom;
+using iText.Kernel.Pdf;
+using iText.Layout;
+namespace png2pdf
+{
+    public partial class Form1 : Form
+    {
+        public Form1(){InitializeComponent();}
+        FolderBrowserDialog K_file = new FolderBrowserDialog();
+        FolderBrowserDialog H_file = new FolderBrowserDialog();
+        string folder1; // hedef yani görsellerin konumu 
+        string KlasorYolu; // kaynak yani yükleecek dosyaların konumu
+        void Dosyalar()
+        {
+            H_file.RootFolder = Environment.SpecialFolder.MyDocuments;
+            H_file.ShowDialog();
+            DialogResult dialog = new DialogResult();
+            dialog = MessageBox.Show("Dosya Konumundan Emin Misiniz ?", "ÇIKIŞ", MessageBoxButtons.YesNo);
+            if (dialog == DialogResult.No)
+            {
+                MessageBox.Show("Tekrardan Seçiniz");
+                H_file.RootFolder = Environment.SpecialFolder.MyDocuments;
+                H_file.ShowDialog();
+            }
+            KlasorYolu = new DirectoryInfo(H_file.SelectedPath).Name;
+            textBox1.Text = KlasorYolu;
+          
+        }
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Dosyalar();
+
+        }
+        private void Veri()
+        {
+            string kaynak = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\" + KlasorYolu;
+            string hedef = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\" + folder1;
+            string[] kaynak_dosya = Directory.GetFiles(kaynak, "*", SearchOption.TopDirectoryOnly);
+            for (int i = 0; i < kaynak_dosya.Length; i++)
+            {
+                string hedef_dosya = kaynak_dosya[i].Substring(kaynak.Length + 1, kaynak_dosya[i].Length - kaynak.Length - 5) + @".pdf";
+                using (PdfWriter writer = new PdfWriter(hedef + @"\" + hedef_dosya))
+                {
+                    using (PdfDocument pdfDocument = new PdfDocument(writer))
+                    {
+                        pdfDocument.SetDefaultPageSize(PageSize.A4.Rotate());
+                        ImageData imageData = ImageDataFactory.Create(kaynak_dosya[i]);
+                        iText.Layout.Element.Image image = new iText.Layout.Element.Image(imageData).SetFixedPosition(0, 0);
+                        image.SetWidth(pdfDocument.GetDefaultPageSize().GetWidth());
+                        image.SetHeight(pdfDocument.GetDefaultPageSize().GetHeight());
+                        using (Document document = new Document(pdfDocument)) { document.Add(image); }
+                    }
+                }
+            }
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Veri();
+            MessageBox.Show("Dosyalarınız Başarıyla Dönüştürüldü ");
+        }
+         void button2_Click(object sender, EventArgs e)
+        {
+            K_file.RootFolder = Environment.SpecialFolder.MyDocuments;
+            K_file.ShowDialog();
+            DialogResult dialog = new DialogResult();
+            dialog = MessageBox.Show("Dosya Konumundan Emin Misiniz ", "ÇIKIŞ", MessageBoxButtons.YesNo);
+            if (dialog == DialogResult.No)
+            {
+                MessageBox.Show("Tekrardan Seçiniz");
+                K_file.RootFolder = Environment.SpecialFolder.MyDocuments;
+                K_file.ShowDialog();
+            }
+            folder1 = new DirectoryInfo(K_file.SelectedPath).Name;
+            textBox2.Text = folder1;
+        }
+    }
+}
+
