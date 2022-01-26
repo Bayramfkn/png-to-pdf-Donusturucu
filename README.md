@@ -1,3 +1,3 @@
 # png to pdf donusturucu
 
-png uzantili dosyayı pdf uzantılı dosyaya cevirme kodu
+Imep kapsaminda yapmis olduğum png uzantili dosyayı pdf uzantılı dosyaya cevirme kodu
